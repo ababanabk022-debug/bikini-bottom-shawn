@@ -175,6 +175,18 @@ export function start(sound, { createDiveTransition, shallowModels } = {}) {
     gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL)));
   const startupPixels = filmMode ? 1920 * 1080 : softwareRenderer ? 720 * 405 : 1440 * 810;
   const minimumPixels = softwareRenderer ? 480 * 270 : 800 * 450;
+  const qualitySelect = document.getElementById('sea-quality');
+  const qualityPreference = 'bikini-surface-quality';
+  if (qualitySelect) {
+    try {
+      const savedQuality = localStorage.getItem(qualityPreference);
+      if (savedQuality === 'auto' || savedQuality === 'detail') qualitySelect.value = savedQuality;
+    } catch {
+      // Keep the setting usable when browser storage is unavailable.
+    }
+    qualitySelect.hidden = filmMode;
+  }
+  let detailQuality = !filmMode && qualitySelect?.value === 'detail';
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1.03;
@@ -469,6 +481,22 @@ export function start(sound, { createDiveTransition, shallowModels } = {}) {
   let fastSeconds = 0;
   let lastShadowUpdate = -Infinity;
   let layoutWidth = 0, layoutHeight = 0;
+  qualitySelect?.addEventListener('change', () => {
+    detailQuality = qualitySelect.value === 'detail';
+    try {
+      localStorage.setItem(qualityPreference, qualitySelect.value);
+    } catch {
+      // Apply the selection for this visit even without storage.
+    }
+    renderScale = null;
+    renderPressure = softwareRenderer;
+    frameTimeTotal = frameTimeSamples = fastSeconds = 0;
+    ocean.setFastOptics(renderPressure);
+    if (layoutWidth && layoutHeight) {
+      resizeCanvas(layoutWidth, layoutHeight);
+      resizeAccessoryViews(layoutWidth, layoutHeight);
+    }
+  });
   const current = new THREE.Vector2();
   const flightRay = new THREE.Raycaster();
   flightRay.layers.enable(detailLayer);
@@ -577,16 +605,15 @@ export function start(sound, { createDiveTransition, shallowModels } = {}) {
     if (renderScale === null) {
       renderScale = Math.min(1, Math.sqrt(startupPixels / (width * height)) / nativeRatio);
     }
-    const ratio = nativeRatio * renderScale;
+    const ratio = detailQuality ? nativeRatio : nativeRatio * renderScale;
     renderer.setDrawingBufferSize(width, height, ratio);
     spray.resize(height * ratio, camera.fov);
     impacts.resize(height * ratio, camera.fov);
   }
 
   function resizeAccessoryViews(width, height) {
-    // Keep these allocations tied to the viewport, so a pixel-budget change
-    // in the sea canvas does not clear or rebuild the two optical textures.
-    const accessoryRatio = Math.min(1, Math.sqrt(startupPixels / (width * height)))
+    // Only the viewport and the selected quality affect these allocations.
+    const accessoryRatio = (detailQuality ? 1 : Math.min(1, Math.sqrt(startupPixels / (width * height))))
       * (softwareRenderer ? .58 : 1);
     const reflectionScale = Math.min(0.52, 920 / width, 540 / height) * accessoryRatio;
     reflectionTarget.setSize(Math.max(2, Math.round(width * reflectionScale)), Math.max(2, Math.round(height * reflectionScale)));
@@ -1199,7 +1226,7 @@ export function start(sound, { createDiveTransition, shallowModels } = {}) {
     if (!canRender || document.hidden || elapsed <= 0) return;
     const texturesReady = texturesSettled || now >= assetDeadline;
     if (!surfaceOpen && !openingRedraw && (openingRequested || !texturesReady)) return;
-    if (!filmMode && surfaceOpen && frame > 5 && elapsed < 1) adaptResolution(elapsed);
+    if (!filmMode && !detailQuality && surfaceOpen && frame > 5 && elapsed < 1) adaptResolution(elapsed);
     if (surfaceOpen && island.visible && frame > 0 && !motion.matches && scrubPointer === null && !scrubKey) {
       dayPhase = (dayPhase + Math.min(elapsed, 0.25) / dayLength) % 1;
       syncTimeSlider();

@@ -151,6 +151,22 @@ body {
 
 #sea-fullscreen { right: calc(max(12px, env(safe-area-inset-right)) + 44px); }
 
+#sea-quality {
+  position: absolute;
+  top: calc(max(10px, env(safe-area-inset-top)) + 6px);
+  right: calc(max(12px, env(safe-area-inset-right)) + 92px);
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid rgb(237 245 245 / 30%);
+  border-radius: 16px;
+  background: rgb(12 39 54 / 72%);
+  color: #edf5f5;
+  font: 13px system-ui, sans-serif;
+  cursor: pointer;
+}
+
+#sea-quality:focus-visible { outline: 1px solid #dfefee; }
+
 :is(#sea-sound, #sea-fullscreen) svg {
   display: block;
   width: 100%;
@@ -203,7 +219,8 @@ body {
 
 .seascape[data-scene="shallow"] #dive-view { opacity: 1; }
 .seascape[data-scene="shallow"]:not([data-crossing]) #dive-view { pointer-events: auto; }
-.seascape:is([data-crossing], [data-scene="shallow"]) :is(#time-of-day, #sea-sound, #sea-fullscreen) { visibility: hidden; }
+.seascape:is([data-crossing], [data-scene="shallow"]) :is(#time-of-day, #sea-sound, #sea-fullscreen, #sea-quality),
+.seascape[data-renderer="unavailable"] #sea-quality { visibility: hidden; }
 
 #dive-status {
   position: absolute;
