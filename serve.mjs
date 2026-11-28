@@ -1,3 +1,4 @@
+import { execFile } from 'node:child_process';
 import { createReadStream } from 'node:fs';
 import { realpath, stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
@@ -5,7 +6,11 @@ import { extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = await realpath(fileURLToPath(new URL('./web', import.meta.url)));
-const port = Number(process.argv[2] ?? 8846);
+const host = '127.0.0.1';
+const defaultPort = 8846;
+const args = process.argv.slice(2);
+const port = Number(args.find(argument => argument !== '--open') ?? defaultPort);
+const openBrowser = process.platform === 'win32' && args.includes('--open');
 const mime = {
   '.css': 'text/css; charset=utf-8',
   '.gz': 'application/gzip',
@@ -17,7 +22,7 @@ const mime = {
   '.webp': 'image/webp',
 };
 
-createServer(async (request, response) => {
+const server = createServer(async (request, response) => {
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     response.writeHead(405, { Allow: 'GET, HEAD' }).end();
     return;
@@ -65,6 +70,22 @@ createServer(async (request, response) => {
   } catch (error) {
     response.writeHead(error instanceof URIError ? 400 : 404).end();
   }
-}).listen(port, '127.0.0.1', () => {
-  console.log(`Bikini Bottom: http://127.0.0.1:${port}/`);
 });
+
+if (openBrowser && port === defaultPort) {
+  server.once('error', error => {
+    if (error.code !== 'EADDRINUSE') throw error;
+    server.listen(0, host);
+  });
+}
+
+server.on('listening', () => {
+  const address = `http://${host}:${server.address().port}/`;
+  console.log(`Bikini Bottom: ${address}`);
+  if (openBrowser) {
+    execFile('rundll32.exe', ['url.dll,FileProtocolHandler', address], { windowsHide: true }, error => {
+      if (error) console.error(`Open this address in your browser: ${address}`);
+    });
+  }
+});
+server.listen(port, host);

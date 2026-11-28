@@ -10,7 +10,7 @@
 
 晨光里的椰岛。低处的日光会在浪间拉长，水桶也随水面缓缓升降。
 
-**[下载完整项目](https://github.com/ababanabk022-debug/bikini-bottom-shawn/archive/refs/tags/v1.0.1.zip)** · **[下载三个独立项目](https://github.com/ababanabk022-debug/bikini-bottom-shawn/releases/tag/v1.0.1)**
+**[下载完整项目](https://github.com/ababanabk022-debug/bikini-bottom-shawn/archive/refs/heads/main.zip)** · **[下载三个独立项目](https://github.com/ababanabk022-debug/bikini-bottom-shawn/releases/tag/v1.0.1)**
 
 ## 海面
 
@@ -122,13 +122,17 @@
 
 ## 启动与下载
 
-需要 Node.js 20 或更高版本，以及支持 WebGL 2 的浏览器。解压完整项目后，在项目目录启动本地服务器。
+需要 Node.js 20 或更高版本，以及支持 WebGL 2 的浏览器。
+
+**Windows 双击启动。** 下载并解压完整项目，双击根目录的 `Open.cmd`。它会启动本地服务并在默认浏览器打开合并版。游玩时请保持命令窗口开启，关闭窗口就会停止服务。默认端口是 8846，已被占用时会改用空闲端口。 [下载完整项目](https://github.com/ababanabk022-debug/bikini-bottom-shawn/archive/refs/heads/main.zip)
+
+也可以在解压后的项目目录通过终端启动。
 
 ```sh
 npm start
 ```
 
-在浏览器打开 [合并版](http://127.0.0.1:8846/)，也可以直接打开任一独立入口。
+用 `npm start` 启动后，可以打开合并版或下面的独立入口。双击版如使用了其他端口，以自动打开的浏览器地址为准。 [本地合并版](http://127.0.0.1:8846/)
 
 | 独立项目 | 可以体验的内容 | 入口 | 独立下载 |
 | --- | --- | --- | --- |
