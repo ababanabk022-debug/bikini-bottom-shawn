@@ -1,3 +1,5 @@
+import { bindFullscreen } from './fullscreen.js';
+
 (() => {
   'use strict';
 
@@ -223,22 +225,7 @@
     releaseTouchInputs.push(clear);
   }
 
-  fullscreen.hidden = !document.fullscreenEnabled;
-  fullscreen.addEventListener('click', async () => {
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else await document.documentElement.requestFullscreen();
-    } catch (error) {
-      console.warn(error);
-    }
-  });
-  document.addEventListener('fullscreenchange', () => {
-    const active = Boolean(document.fullscreenElement);
-    const label = active ? '退出全屏' : '全屏';
-    fullscreen.setAttribute('aria-pressed', String(active));
-    fullscreen.setAttribute('aria-label', label);
-    fullscreen.title = label;
-  });
+  bindFullscreen(fullscreen, surfaceHost?.document ?? document);
   help.addEventListener('toggle', () => { if (help.open) viewSettings.open = false; });
   viewSettings.addEventListener('toggle', () => { if (viewSettings.open) help.open = false; });
   canvas.addEventListener('pointerdown', () => {

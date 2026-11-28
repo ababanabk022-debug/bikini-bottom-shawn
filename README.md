@@ -134,6 +134,8 @@ npm start
 
 用 `npm start` 启动后，可以打开合并版或下面的独立入口。双击版如使用了其他端口，以自动打开的浏览器地址为准。 [本地合并版](http://127.0.0.1:8846/)
 
+点右上角的全屏图标，可以让整个合并版进入全屏。下潜和返回海面时会保持全屏，再点图标或按 Esc 即可退出。
+
 | 独立项目 | 可以体验的内容 | 入口 | 独立下载 |
 | --- | --- | --- | --- |
 | 海面 | 风浪、昼夜、拖拽浮物与携牌飞行的海鸥 | [本地海面](http://127.0.0.1:8846/surface/) · [目录](web/surface/) | [surface.zip](https://github.com/ababanabk022-debug/bikini-bottom-shawn/releases/download/v1.0.1/surface.zip) |
